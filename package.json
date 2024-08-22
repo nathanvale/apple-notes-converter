@@ -2,18 +2,38 @@
   "name": "apple-notes-convertor",
   "description": "",
   "scripts": {
-    "start": "node --import tsx src/index.ts"
+    "start": "node --import tsx src/index.ts",
+    "format": "prettier --write .",
+    "lint": "eslint .",
+    "test": "vitest",
+    "typecheck": "tsc",
+    "validate": "run-p \"test -- --run\" lint typecheck"
+  },
+  "type": "module",
+  "imports": {
+    "#app/*": "./src/*",
+    "#tests/*": "./tests/*"
   },
   "author": "",
   "license": "ISC",
-  "dependencies": {
-    "@types/node": "^20.0.0",
-    "dotenv": "^16.4.5",
-    "sqlite3": "^5.0.0",
-    "tsx": "^3.0.0",
-    "typescript": "^5.0.0"
-  },
   "engines": {
     "node": "22.6.0"
-  }
+  },
+  "devDependencies": {
+    "@epic-web/config": "^1.12.0",
+    "@types/better-sqlite3": "^7.6.11",
+    "@types/eslint": "^8.56.10",
+    "@types/node": "^20.0.0",
+    "@vitest/coverage-v8": "^2.0.5",
+    "better-sqlite3": "^11.2.1",
+    "dotenv": "^16.4.5",
+    "eslint": "^9.7.0",
+    "npm-run-all": "^4.1.5",
+    "prettier": "^3.3.3",
+    "prettier-plugin-sql": "^0.18.1",
+    "tsx": "^4.16.2",
+    "typescript": "^5.5.3",
+    "vitest": "^2.0.5"
+  },
+  "prettier": "@epic-web/config/prettier"
 }

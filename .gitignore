@@ -1,2 +1,4 @@
 node_modules
 prisma/entries.db
+.env
+coverage
