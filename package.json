@@ -1,0 +1,19 @@
+{
+  "name": "apple-notes-convertor",
+  "description": "",
+  "scripts": {
+    "start": "node --import tsx src/index.ts"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@types/node": "^20.0.0",
+    "dotenv": "^16.4.5",
+    "sqlite3": "^5.0.0",
+    "tsx": "^3.0.0",
+    "typescript": "^5.0.0"
+  },
+  "engines": {
+    "node": "22.6.0"
+  }
+}
