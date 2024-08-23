@@ -22,8 +22,9 @@ export function parseJournal(entry: string) {
 	const parseList = (text: string) =>
 		text
 			.split('\n')
-			.filter((line) => line.startsWith('-'))
-			.map((line) => line.slice(1).trim())
+			.filter((line) => line.trim().length > 0)
+			.map((line) => line.replace(/^\s*[-•*]\s*/, '').trim())
+			.slice(1) // Skip the first item
 
 	const parseBody = (text: string) => {
 		const [_first, ...body] = text.split('\n')
