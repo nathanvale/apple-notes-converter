@@ -14,8 +14,7 @@
     "#app/*": "./src/*",
     "#tests/*": "./tests/*"
   },
-  "author": "",
-  "license": "ISC",
+  "author": "Nathan Vale",
   "engines": {
     "node": "22.6.0"
   },
