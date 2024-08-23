@@ -5,8 +5,8 @@ describe('parseJournal', () => {
 	const journalEntry = `2024/08/21 Cleaning Up, Connecting, and New Beginnings
 
 ## Key Events
--Cleaned out old GitHub repos, making space for new projects.
--Spent quality time with Melanie at Cafe Bliss.
+ -  Cleaned out old GitHub repos, making space for new projects.
+- Spent quality time with Melanie at Cafe Bliss.
 -Felt stress due to Melanie's anxieties about the weekend.
 -Started learning about setting up TypeScript with Node and SQLite for a new project.
 -Experienced growth through progress in setting up the tech stack for a new app.
