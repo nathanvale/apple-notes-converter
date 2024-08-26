@@ -3,40 +3,14 @@ import { fileURLToPath } from 'node:url'
 import { join } from 'path'
 import Database from 'better-sqlite3'
 import 'dotenv/config'
+import { type AppleScriptNote, parseAppleScriptOutput } from './parse-apple-script-output'
 import { runAppleScript } from './run-apple-script'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = join(__filename, '..') // Get the directory name
 
-export interface AppleScriptNote {
-	id: string
-	title: string
-	content: string
-}
 
-export const parseAppleScriptOutput = (output: string): AppleScriptNote[] => {
-	try {
-		return output
-			.split('__________')
-			.filter(Boolean)
-			.map((noteStr) => {
-				if (!noteStr.includes('----------')) {
-					console.error(noteStr)
-					throw new Error('Invalid note format')
-				}
-				const [id, title, content] = noteStr.split('----------')
-				const appleScriptNote: AppleScriptNote = {
-					id: id?.trim() || '',
-					title: title?.trim() || '',
-					content: content?.trim() || '',
-				}
-				return appleScriptNote
-			})
-	} catch (error) {
-		console.error(error)
-		throw new Error('Failed to parse AppleScript output')
-	}
-}
+
 await (async () => {
 	if (!process.env.DATABASE_PATH) {
 		console.error('DATABASE_PATH environment variable is not set.')

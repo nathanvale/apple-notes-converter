@@ -1,7 +1,7 @@
 import { runAppleScript } from './run-apple-script'
 
 // Function to loop through all notes in the "GJB" folder
-async function processNotesInFolder(folderName: string) {
+export async function formatEntries(folderName: string) {
 	try {
 		// Get the list of notes in the folder
 		const listNotesScript = `
@@ -52,12 +52,13 @@ async function processNotesInFolder(folderName: string) {
 		console.log(`All notes in the folder "${folderName}" have been processed.`)
 	} catch (error) {
 		console.error(error)
+		throw error // Rethrow the error to allow it to be caught by tests
 	}
 }
 
-await (async () => {
-	console.log('Removing formatting from notes...')
-	await processNotesInFolder('GJB').catch((err) => {
-		console.error('An error occurred:', err)
-	})
-})()
+// await (async () => {
+// 	console.log('Removing formatting from notes...')
+// 	await processNotesInFolder('GJB').catch((err) => {
+// 		console.error('An error occurred:', err)
+// 	})
+// })()
