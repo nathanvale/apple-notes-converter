@@ -8,7 +8,7 @@
     "lint": "eslint .",
     "test": "vitest",
     "typecheck": "tsc",
-    "validate": "run-p \"test -- --run\" lint typecheck"
+    "validate": "run-p \"test -- --run --coverage\" lint typecheck"
   },
   "type": "module",
   "imports": {
