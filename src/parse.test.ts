@@ -5,11 +5,15 @@ describe('parseJournal', () => {
 	const journalEntry = `2024/08/21 Cleaning Up, Connecting, and New Beginnings
 
 ## Key Events
- -  Cleaned out old GitHub repos, making space for new projects.
-- Spent quality time with Melanie at Cafe Bliss.
+ *    Cleaned out old GitHub repos, making space for new projects.
+Spent quality time with Melanie at Cafe Bliss.
 -Felt stress due to Melanie's anxieties about the weekend.
--Started learning about setting up TypeScript with Node and SQLite for a new project.
+*    Started learning about setting up TypeScript with Node and SQLite for a new project.
 -Experienced growth through progress in setting up the tech stack for a new app.
+ •   Continue using GoodNotes for training and note-taking.
+•   Go to the gym at least three times this week.
+•   Tackle the reminders list tomorrow.
+  •    Spend quality time with Levi on his maze and craft projects.
 
 ## Action Items
 
@@ -35,6 +39,10 @@ On a more positive note, I made progress in my learning today. I started setting
 Today was a mix of accomplishment, connection, and emotional complexity. On one hand, I experienced significant progress in my personal and professional life, with the successful cleanup of my GitHub repos and the start of a new technical project. These achievements gave me a sense of control and forward momentum, contributing positively to my self-esteem and overall sense of purpose.
 On the other hand, the emotional impact of Melanie's anxieties introduced a layer of stress that I hadn't anticipated. My own worries were triggered by her concerns, leading to a ripple effect that affected my mood. The conversation about exes brought up unresolved feelings and highlighted differences in how we both relate to our pasts, adding another dimension of emotional complexity to the day.
 Balancing the excitement of new beginnings with the weight of emotional challenges will be crucial moving forward. It might be helpful to explore ways to support Melanie through her anxieties without allowing them to overshadow my own well-being. Finding this balance could enhance both my personal resilience and the strength of our relationship.
+
+
+## Additional Notes
+blah blah blah
 `
 
 	it('should correctly parse the date and title', () => {
@@ -51,6 +59,11 @@ Balancing the excitement of new beginnings with the weight of emotional challeng
 			},
 			{
 				journalEntry: `2024/08/23 A Day of Reflection and Growth`,
+				expectedDate: '2024/08/23',
+				expectedTitle: 'A Day of Reflection and Growth',
+			},
+			{
+				journalEntry: `2024/08/23 -A Day of Reflection and Growth`,
 				expectedDate: '2024/08/23',
 				expectedTitle: 'A Day of Reflection and Growth',
 			},
@@ -71,6 +84,10 @@ Balancing the excitement of new beginnings with the weight of emotional challeng
 			"Felt stress due to Melanie's anxieties about the weekend.",
 			'Started learning about setting up TypeScript with Node and SQLite for a new project.',
 			'Experienced growth through progress in setting up the tech stack for a new app.',
+			'Continue using GoodNotes for training and note-taking.',
+			'Go to the gym at least three times this week.',
+			'Tackle the reminders list tomorrow.',
+			'Spend quality time with Levi on his maze and craft projects.',
 		])
 	})
 
