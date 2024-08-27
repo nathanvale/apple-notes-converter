@@ -1,4 +1,5 @@
 import 'dotenv/config'
+import './db-setup.ts'
 // we need these to be imported first 👆
 
 import { beforeEach, vi, type MockInstance } from 'vitest'

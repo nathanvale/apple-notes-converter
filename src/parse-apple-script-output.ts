@@ -11,7 +11,6 @@ export const parseAppleScriptOutput = (output: string): AppleScriptNote[] => {
 			.filter(Boolean)
 			.map((noteStr) => {
 				if (!noteStr.includes('----------')) {
-					console.error(noteStr)
 					throw new Error('Invalid note format')
 				}
 				const [id, title, content] = noteStr.split('----------')
@@ -23,6 +22,7 @@ export const parseAppleScriptOutput = (output: string): AppleScriptNote[] => {
 				return appleScriptNote
 			})
 	} catch (error) {
+		console.error(error)
 		throw error
 	}
 }
