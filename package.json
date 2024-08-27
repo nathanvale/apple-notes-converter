@@ -5,6 +5,7 @@
     "start": "node --import tsx src/index.ts",
     "format": "prettier --write .",
     "format-entries": "node --import tsx src/format-entries.ts",
+    "setup": "prisma generate && prisma migrate deploy && prisma db seed",
     "lint": "eslint .",
     "test": "vitest",
     "typecheck": "tsc",
@@ -21,20 +22,30 @@
   },
   "devDependencies": {
     "@epic-web/config": "^1.12.0",
+    "@epic-web/remember": "^1.1.0",
     "@types/better-sqlite3": "^7.6.11",
     "@types/eslint": "^8.56.10",
+    "@types/fs-extra": "^11.0.4",
     "@types/node": "^20.0.0",
     "@vitest/coverage-v8": "^2.0.5",
+    "applescript": "^1.0.0",
     "better-sqlite3": "^11.2.1",
     "dotenv": "^16.4.5",
     "eslint": "^9.7.0",
+    "fs-extra": "^11.2.0",
     "npm-run-all": "^4.1.5",
     "prettier": "^3.3.3",
     "prettier-plugin-sql": "^0.18.1",
+    "prisma": "^5.18.0",
     "tsx": "^4.16.2",
     "typescript": "^5.5.3",
-    "vitest": "^2.0.5",
-    "applescript": "^1.0.0"
+    "vitest": "^2.0.5"
   },
-  "prettier": "@epic-web/config/prettier"
+  "prettier": "@epic-web/config/prettier",
+  "dependencies": {
+    "@prisma/client": "^5.18.0"
+  },
+  "prisma": {
+    "seed": "tsx prisma/seed.ts"
+  }
 }

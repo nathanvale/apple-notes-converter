@@ -76,6 +76,12 @@ blah blah blah
 		})
 	})
 
+	it('should throw an error if the date and title are not found', () => {
+		expect(() => parseJournal('Invalid entry')).toThrow(
+			'The string does not match the expected pattern.',
+		)
+	})
+
 	it('should correctly parse the key events', () => {
 		const result = parseJournal(journalEntry)
 		expect(result.keyEvents).toEqual([

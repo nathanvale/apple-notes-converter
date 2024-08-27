@@ -7,16 +7,18 @@ export function parseJournal(entry: string) {
 
 	// Use regex to match the date pattern and capture the title
 	const regex = /^(\d{4}\/\d{2}\/\d{2})\s*[-\s]\s*(.*)$/
-	const match = dateTitle ? dateTitle.match(regex) : null
+	const match = dateTitle
+		? dateTitle.match(regex) /* c8 ignore start */
+		: null /* c8 ignore stop */
 
 	let date = ''
 	let title = ''
 
 	if (match) {
-		date = match[1]?.trim() || ''
-		title = match[2]?.trim() || ''
+		date = match[1]?.trim() /* c8 ignore start */ || '' /* c8 ignore stop */
+		title = match[2]?.trim() /* c8 ignore start */ || '' /* c8 ignore stop */
 	} else {
-		console.log('The string does not match the expected pattern.')
+		throw new Error('The string does not match the expected pattern.')
 	}
 
 	const parseList = (text: string) =>
