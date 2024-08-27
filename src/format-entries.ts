@@ -1,4 +1,4 @@
-import { runAppleScript } from './run-apple-script'
+import { runAppleScript } from './utils/run-apple-script'
 
 // Function to loop through all notes in the "GJB" folder
 export async function formatEntries(folderName: string) {
@@ -45,11 +45,8 @@ export async function formatEntries(folderName: string) {
         end tell
       `
 
-			console.log(`Processing note: ${noteTitle}`)
 			await runAppleScript(script)
 		}
-
-		console.log(`All notes in the folder "${folderName}" have been processed.`)
 	} catch (error) {
 		console.error(error)
 		throw error // Rethrow the error to allow it to be caught by tests

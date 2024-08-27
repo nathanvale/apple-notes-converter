@@ -1,8 +1,7 @@
+/* c8 ignore start */
 import 'dotenv/config'
-import { processNotes } from './processNotes'
+import { processEntries } from './process-entries'
 
 await (async () => {
-	await (async () => {
-		await processNotes()
-	})()
+	await processEntries()
 })()
