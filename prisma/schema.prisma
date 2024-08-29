@@ -13,8 +13,28 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+// 
 model Entry {
+  id          Int          @id @default(autoincrement())
+  title       String
+  content     String
+  date        DateTime     @default(now())
+  assessment  String?
+  notes       String?
+  keyEvents   KeyEvent[] // One-to-many relation with KeyEvent
+  actionItems ActionItem[] // One-to-many relation with ActionItem
+}
+
+model KeyEvent {
   id      Int    @id @default(autoincrement())
-  title   String
-  content String
+  event   String
+  entryId Int
+  entry   Entry  @relation(fields: [entryId], references: [id])
+}
+
+model ActionItem {
+  id      Int    @id @default(autoincrement())
+  action  String
+  entryId Int
+  entry   Entry  @relation(fields: [entryId], references: [id])
 }

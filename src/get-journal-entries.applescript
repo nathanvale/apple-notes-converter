@@ -3,7 +3,7 @@ set itemDelimiter to "__________" & return
 tell application "Notes"
 	set filteredNotes to ""
 	try
-		set noteList to notes of folder "GJB"
+		set noteList to notes of folder "Gratitude Journal"
 		set noteCount to count of noteList
 		
 		repeat with i from 1 to noteCount

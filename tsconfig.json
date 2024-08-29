@@ -1,6 +1,7 @@
 {
 	"include": ["**/*.ts", "**/*.tsx"],
-	"extends": ["@epic-web/config/typescript"],
+	"exclude": ["node_modules", "dist", ".quokka"],
+	"extends": ["./node_modules/@epic-web/config/typescript.json"],
 	"compilerOptions": {
 		"paths": {
 			"#app/*": ["./src/*"],
