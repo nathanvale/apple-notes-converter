@@ -33,7 +33,7 @@ describe('processEntries', () => {
 				id: 2,
 				title: '2024/08/25 Title 2',
 				content:
-					'2024/08/25 Title 2\n\n## Key Events\n\t•\tWorked on parsing journal entries for database import\n\t•\tSpent quality time with Levi at a scout event and Queen Vic Market\n\n## Action Items\n\n\t•\tContinue refining the journal entry parsing process to ensure seamless database integration.\n\t•\tPlan more structured activities with Levi to help manage the challenges of extended time together.\n\n\n## Journal Entry\n\nToday, I achieved a significant milestone by figuring out how to parse all my journal entries so they could be imported into a database. \n\n## Psychological Assessment\n\nToday was a day of positive progress and personal reflection.',
+					'2024/08/25 Title 2\n\n## Key Events\n\t•\tWorked on parsing journal entries for database import\n\t•\tSpent quality time with Levi at a scout event and Queen Vic Market\n\n## Action Items\n\n\t•\tContinue refining the journal entry parsing process to ensure seamless database integration.\n\t•\tPlan more structured activities with Levi to help manage the challenges of extended time together.\n\n\n## Journal Entry\n\nToday, I achieved a significant milestone by figuring out how to parse all my journal entries so they could be imported into a database. \n\n## Psychological Assessment',
 			},
 			{
 				id: 3,
@@ -53,7 +53,12 @@ describe('processEntries', () => {
 		await processEntries()
 
 		// Verify that the entries were inserted into the database
-		const entriesInDb = await prisma.entry.findMany()
+		const entriesInDb = await prisma.entry.findMany({
+			include: {
+				keyEvents: true, // Include related KeyEvents
+				actionItems: true, // Include related ActionItems
+			},
+		})
 		expect(entriesInDb).toHaveLength(mockEntries.length)
 		expect(entriesInDb).toMatchSnapshot()
 	})
