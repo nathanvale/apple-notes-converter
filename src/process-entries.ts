@@ -1,15 +1,75 @@
 import { readFile } from 'fs/promises'
 import { fileURLToPath } from 'node:url'
 import { join } from 'path'
-import {
-	type AppleScriptNote,
-	parseAppleScriptOutput,
-} from './parse-apple-script-output'
+import { type ActionItem, type Entry, type KeyEvent } from '@prisma/client'
+import { parseJournal, type ParsedJournal } from './parse'
+import { parseAppleScriptOutput } from './parse-apple-script-output'
 import { prisma } from './utils/db.server'
 import { runAppleScript } from './utils/run-apple-script'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = join(__filename, '..') // Get the directory name
+
+async function convertJsonToPrismaModels(jsonOutput: ParsedJournal) {
+	const {
+		date,
+		title,
+		journalEntry,
+		assessment,
+		keyEvents,
+		actionItems,
+		notes,
+	} = jsonOutput
+
+	// Create the Entry first
+	const entry: Entry = await prisma.entry.create({
+		data: {
+			title,
+			content: journalEntry,
+			date: new Date(date),
+			assessment: assessment,
+			notes: notes, // Assuming no notes are provided in this case
+		},
+	})
+
+	// Create the KeyEvents
+	const keyEventPromises = keyEvents.map((event: string) =>
+		prisma.keyEvent.create({
+			data: {
+				event,
+				entryId: entry.id, // Link to the created Entry
+			},
+		}),
+	)
+
+	const createdKeyEvents: KeyEvent[] = []
+	for (const keyEventPromise of keyEventPromises) {
+		const createdKeyEvent = await keyEventPromise
+		createdKeyEvents.push(createdKeyEvent)
+	}
+
+	// Create the ActionItems
+	const actionItemPromises = actionItems.map((action: string) =>
+		prisma.actionItem.create({
+			data: {
+				action,
+				entryId: entry.id, // Link to the created Entry
+			},
+		}),
+	)
+
+	const createdActionItems: ActionItem[] = []
+	for (const actionItemPromise of actionItemPromises) {
+		const createdActionItem = await actionItemPromise
+		createdActionItems.push(createdActionItem)
+	}
+
+	return {
+		entry,
+		keyEvents: createdKeyEvents,
+		actionItems: createdActionItems,
+	}
+}
 
 export async function processEntries() {
 	try {
@@ -21,15 +81,14 @@ export async function processEntries() {
 		// Parse the AppleScript output
 		const entries = parseAppleScriptOutput(output)
 
-		// Insert notes into the database using Prisma
-		await prisma.entry.createMany({
-			data: entries.map((entry: AppleScriptNote) => {
-				return {
-					title: entry.title,
-					content: entry.content,
-				}
-			}),
-		})
+		// Process each entry sequentially
+		for (const entry of entries) {
+			// Parse the journal entry
+			const parsedJournal = parseJournal(entry.content)
+
+			// Convert the parsed journal entry to Prisma models and insert into database
+			await convertJsonToPrismaModels(parsedJournal)
+		}
 
 		console.log('Entries have been inserted into the database successfully.')
 

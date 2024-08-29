@@ -1,0 +1,15 @@
+-- CreateTable
+CREATE TABLE "KeyEvent" (
+    "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    "event" TEXT NOT NULL,
+    "entryId" INTEGER NOT NULL,
+    CONSTRAINT "KeyEvent_entryId_fkey" FOREIGN KEY ("entryId") REFERENCES "Entry" ("id") ON DELETE RESTRICT ON UPDATE CASCADE
+);
+
+-- CreateTable
+CREATE TABLE "ActionItem" (
+    "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    "action" TEXT NOT NULL,
+    "entryId" INTEGER NOT NULL,
+    CONSTRAINT "ActionItem_entryId_fkey" FOREIGN KEY ("entryId") REFERENCES "Entry" ("id") ON DELETE RESTRICT ON UPDATE CASCADE
+);
