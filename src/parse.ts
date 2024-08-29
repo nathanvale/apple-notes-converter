@@ -1,3 +1,13 @@
+export interface ParsedJournal {
+	date: string
+	title: string
+	keyEvents: string[]
+	actionItems: string[]
+	journalEntry: string
+	assessment: string | null
+	notes: string | null
+}
+
 // Function to parse the journal entry into JSON
 export function parseJournal(entry: string) {
 	const sections = entry.split(/##\s+/).map((s) => {
@@ -33,13 +43,14 @@ export function parseJournal(entry: string) {
 		return body.join('\n').trim()
 	}
 
-	const jsonOutput = {
+	const jsonOutput: ParsedJournal = {
 		date,
 		title,
 		keyEvents: parseList(rest[0] || ''),
 		actionItems: parseList(rest[1] || ''),
 		journalEntry: parseBody(rest[2] || ''),
-		assessment: parseBody(rest[3] || ''),
+		assessment: rest[3] ? parseBody(rest[3]) : null,
+		notes: rest[4] ? parseBody(rest[4]) : null,
 	}
 
 	return jsonOutput
