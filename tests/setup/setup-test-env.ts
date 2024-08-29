@@ -1,5 +1,10 @@
 import 'dotenv/config'
 import './db-setup.ts'
+
+// Set the timezone for the tests so that created sqllite3 dates are consistent
+// in CI and local
+process.env.TZ = 'Australia/Melbourne'
+
 // we need these to be imported first 👆
 
 import { beforeEach, vi, type MockInstance } from 'vitest'
