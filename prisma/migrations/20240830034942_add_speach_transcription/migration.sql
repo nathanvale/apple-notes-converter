@@ -1,0 +1,6 @@
+-- CreateTable
+CREATE TABLE "SpeechTranscription" (
+    "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    "transcription" TEXT NOT NULL,
+    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
