@@ -1,4 +1,4 @@
-import { runAppleScript } from './utils/run-apple-script'
+import { runAppleScript } from './run-apple-script'
 
 // Function to loop through all notes in the "GJB" folder
 export async function formatEntries(folderName: string) {

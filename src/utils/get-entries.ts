@@ -3,7 +3,7 @@
 	autoLog: false,
 })
 
-import { prisma } from './utils/db.server'
+import { prisma } from './db.server'
 
 async function fetchEntriesWithRelationships() {
 	await prisma.entry.findMany({

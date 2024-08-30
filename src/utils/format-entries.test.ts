@@ -1,9 +1,9 @@
 import { vi, describe, it, expect, beforeEach, type Mock } from 'vitest'
 import { consoleError } from '#tests/setup/setup-test-env.ts'
 import { formatEntries } from './format-entries'
-import { runAppleScript } from './utils/run-apple-script'
+import { runAppleScript } from './run-apple-script'
 // Mock the runAppleScript function
-vi.mock('./utils/run-apple-script', () => ({
+vi.mock('./run-apple-script', () => ({
 	runAppleScript: vi.fn(),
 }))
 

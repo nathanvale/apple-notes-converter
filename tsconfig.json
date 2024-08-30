@@ -4,7 +4,7 @@
 	"extends": ["./node_modules/@epic-web/config/typescript.json"],
 	"compilerOptions": {
 		"paths": {
-			"#app/*": ["./src/*"],
+			"#node/*": ["./src/*"],
 			"#tests/*": ["./tests/*"]
 		}
 	}
