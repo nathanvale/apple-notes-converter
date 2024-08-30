@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { parseJournal } from './parse'
+import { parseJournal } from './parse-journal'
 
 describe('parseJournal', () => {
 	const journalEntry = `2024/08/21 Cleaning Up, Connecting, and New Beginnings

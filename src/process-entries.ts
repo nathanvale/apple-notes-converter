@@ -2,9 +2,9 @@ import { readFile } from 'fs/promises'
 import { fileURLToPath } from 'node:url'
 import { join } from 'path'
 import { type ActionItem, type Entry, type KeyEvent } from '@prisma/client'
-import { parseJournal, type ParsedJournal } from './parse'
-import { parseAppleScriptOutput } from './parse-apple-script-output'
 import { prisma } from './utils/db.server'
+import { parseAppleScriptOutput } from './utils/parse-apple-script-output'
+import { parseJournal, type ParsedJournal } from './utils/parse-journal'
 import { runAppleScript } from './utils/run-apple-script'
 
 const __filename = fileURLToPath(import.meta.url)
