@@ -1,95 +1,50 @@
-/* c8 ignore start */
-import 'dotenv/config'
-import fs from 'fs'
-import { PrismaClient } from '@prisma/client'
-import bodyParser from 'body-parser'
-import express, { type Request, type Response } from 'express'
-import multer from 'multer'
-import OpenAI from 'openai'
+import { createRequestHandler } from '@remix-run/express'
+import { type ServerBuild } from '@remix-run/node'
+import express, {
+	type Request,
+	type Response,
+	type NextFunction,
+} from 'express'
+import { type ViteDevServer } from 'vite'
 
-// Initialize Prisma Client
-const prisma = new PrismaClient()
+const isProduction = process.env.NODE_ENV === 'production'
 
-// Initialize OpenAI API with your API key
-const openai = new OpenAI({
-	apiKey: process.env.OPENAI_API_KEY, // Add your OpenAI API key in the environment variables
-})
+const viteDevServer: ViteDevServer | null = isProduction
+	? null
+	: await import('vite').then((vite) =>
+			vite.createServer({
+				server: { middlewareMode: true },
+			}),
+		)
 
 const app = express()
 
-app.use(express.static('public'))
-app.use(bodyParser.json())
-
-// Set up multer for file upload handling
-const storage = multer.diskStorage({
-	destination: (req, file, cb) => {
-		console.log('Saving to /server/uploads/ folder')
-		cb(null, './server/uploads')
-	},
-	filename: (req, file, cb) => {
-		const filename = `${Date.now()}-${file.originalname}`
-		console.log(`Filename: ${filename}`)
-		cb(null, filename)
-	},
-})
-
-const upload = multer({
-	storage,
-	limits: { fileSize: 10000000 }, // Limit file size to 10MB for example
-	fileFilter: (req, file, cb) => {
-		if (file.mimetype !== 'audio/wav' && file.mimetype !== 'audio/mpeg') {
-			return cb(new Error('Only .wav or .mp3 files are allowed!'))
-		}
-		cb(null, true)
-	},
-})
-
-// Route to handle file upload and transcription
-app.post(
-	'/upload',
-	upload.single('audio'),
-	async (req: Request, res: Response) => {
-		try {
-			const audioFilePath = req.file?.path
-
-			console.log('File uploaded:', req.file) // Log file details
-
-			if (!audioFilePath) {
-				return res.status(400).send('No audio file uploaded.')
-			}
-
-			// Read the audio file and send it to OpenAI for transcription
-			const fileStream = fs.createReadStream(audioFilePath)
-			const response = await openai.audio.transcriptions.create({
-				file: fileStream,
-				model: 'whisper-1',
-			})
-
-			const transcription = response.text
-
-			// Save transcription to the database
-			const savedTranscription = await prisma.speechTranscription.create({
-				data: {
-					transcription: transcription,
-				},
-			})
-
-			// Send back the transcription as the response
-			res.json({ transcription: savedTranscription.transcription })
-
-			// Clean up: remove the audio file after processing
-			fs.unlink(audioFilePath, (err) => {
-				if (err) console.error('Error deleting audio file:', err)
-			})
-		} catch (error) {
-			console.error('Error during transcription:', error)
-			res.status(500).send('Error during transcription.')
-		}
-	},
+// Use Vite's middlewares in development or serve static files in production
+app.use(
+	viteDevServer
+		? (viteDevServer as ViteDevServer).middlewares
+		: express.static('build/client'),
 )
 
-// Start the server
-const PORT = process.env.PORT || 3000
-app.listen(PORT, () => {
-	console.log(`Server is running on port ${PORT}`)
+// Define a function to load the build
+async function getBuild() {
+	const build = viteDevServer
+		? viteDevServer.ssrLoadModule('virtual:remix/server-build')
+		: // @ts-ignore this should exist before running the server
+			// but it may not exist just yet.
+			await import('../build/server/index.js')
+	// not sure how to make this happy 🤷‍♂️
+	return build as unknown as ServerBuild
+}
+
+// Handle all requests with Remix
+app.all('*', async (req: Request, res: Response, next: NextFunction) => {
+	const build = await getBuild()
+	const handler = createRequestHandler({ build })
+	return handler(req, res, next)
+})
+
+// Start the Express server
+app.listen(3000, () => {
+	console.log('App listening on http://localhost:3000')
 })
