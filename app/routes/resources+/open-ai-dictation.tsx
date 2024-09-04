@@ -1,10 +1,16 @@
 import { type ActionFunctionArgs, json } from '@remix-run/node'
 import { useFetcher } from '@remix-run/react'
 import OpenAI from 'openai'
-import { useEffect, useState, useRef } from 'react'
+import {
+	useEffect,
+	useState,
+	useRef,
+	createContext,
+	type ReactNode,
+	useContext,
+} from 'react'
 import { type RecordRTCPromisesHandler } from 'recordrtc'
 import { type ErrorResponse, type SuccessResponse } from '#app/types/api'
-import { useDictationContext } from '#app/utils/providers/DictationProvider.js'
 import { prisma } from '#node/utils/db.server'
 
 export type OpenAiDictationResponse = SuccessResponse | ErrorResponse
@@ -72,9 +78,9 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 	}
 }
 
-export function OpenAiDictationButton({ buttonId }: { buttonId: string }) {
+export function OpenAiDictationButton({ fetcherKey }: { fetcherKey: string }) {
 	const { submitTranscription, isProcessing } = useOpenAiDictation({
-		buttonId,
+		fetcherKey,
 	})
 
 	const onDictationComplete = (audioBlob: Blob) => {
@@ -100,9 +106,9 @@ export function OpenAiDictationButton({ buttonId }: { buttonId: string }) {
 	)
 }
 
-export function useOpenAiDictation({ buttonId }: { buttonId: string }) {
+export function useOpenAiDictation({ fetcherKey }: { fetcherKey: string }) {
 	const fetcher = useFetcher<typeof action>({
-		key: buttonId,
+		key: fetcherKey,
 	})
 
 	const [transcription, setTranscription] = useState<string | null>(null)
@@ -215,4 +221,40 @@ const useVoiceDictation = ({ onDictationComplete }: UseVoiceRecorderProps) => {
 		isUsingMicrophone,
 		toggleDictation,
 	}
+}
+
+interface DictationContextProps {
+	isUsingMicrophone: boolean
+	setIsUsingMicrophone: (value: boolean) => void
+}
+
+const DictationContext = createContext<DictationContextProps | undefined>(
+	undefined,
+)
+
+export const useDictationContext = (): DictationContextProps => {
+	const context = useContext(DictationContext)
+	if (!context) {
+		throw new Error(
+			'useDictationContext must be used within a DictationProvider',
+		)
+	}
+	return context
+}
+
+interface DictationProviderProps {
+	children: ReactNode
+}
+
+export const DictationProvider = ({
+	children,
+}: DictationProviderProps): JSX.Element => {
+	const [isUsingMicrophone, setIsUsingMicrophone] = useState(false)
+	return (
+		<DictationContext.Provider
+			value={{ isUsingMicrophone, setIsUsingMicrophone }}
+		>
+			{children}
+		</DictationContext.Provider>
+	)
 }

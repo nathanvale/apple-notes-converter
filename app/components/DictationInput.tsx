@@ -1,12 +1,16 @@
-import React from 'react'
+import React, { useRef } from 'react'
+import { ulid } from 'ulid'
 import {
 	OpenAiDictationButton,
 	useOpenAiDictation,
 } from '#app/routes/resources+/open-ai-dictation'
 
-export function DictationInput({ buttonId }: { buttonId: string }) {
+export function DictationInput() {
+	// Generate a unique fetcher key once per component mount
+	const fetcherKeyRef = useRef<string>(ulid())
+	const fetcherKey = fetcherKeyRef.current
 	const { error, isProcessing, transcription, setTranscription } =
-		useOpenAiDictation({ buttonId })
+		useOpenAiDictation({ fetcherKey })
 	return (
 		<div>
 			<input
@@ -15,7 +19,7 @@ export function DictationInput({ buttonId }: { buttonId: string }) {
 				onChange={(e) => setTranscription(e.target.value)}
 				placeholder="Dictated text will appear here"
 			/>
-			<OpenAiDictationButton buttonId={buttonId} />
+			<OpenAiDictationButton fetcherKey={fetcherKey} />
 			{isProcessing && <p>Processing...</p>}
 			{error && <p className="error">{error}</p>}
 		</div>
