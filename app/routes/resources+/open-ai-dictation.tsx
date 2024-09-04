@@ -1,15 +1,23 @@
 import { type ActionFunctionArgs, json } from '@remix-run/node'
 import { useFetcher } from '@remix-run/react'
 import OpenAI from 'openai'
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
+import { type RecordRTCPromisesHandler } from 'recordrtc'
 import { type ErrorResponse, type SuccessResponse } from '#app/types/api'
 import { useDictationContext } from '#app/utils/providers/DictationProvider.js'
 import { prisma } from '#node/utils/db.server'
 
 export type OpenAiDictationResponse = SuccessResponse | ErrorResponse
 
+type CustomError = Error & {
+	code?: string
+	message: string
+	param?: string
+	type?: string
+}
+
 const openai = new OpenAI({
-	apiKey: process.env.OPENAI_API_KEY, // Add your OpenAI API key in the environment variables
+	apiKey: process.env.OPENAI_API_KEY,
 })
 
 const errorResponse = (message: string, status: number = 400) => {
@@ -25,8 +33,8 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 			return errorResponse('No audio file uploaded.')
 		}
 
-		if (!['audio/wav', 'audio/mpeg'].includes(audioFile.type)) {
-			return errorResponse('Only .wav or .mp3 files are allowed!')
+		if (!['audio/wav'].includes(audioFile.type)) {
+			return errorResponse('Only .wav allowed!')
 		}
 
 		if (audioFile.size > 10 * 1024 * 1024) {
@@ -48,9 +56,19 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 			status: 'success',
 			data: { transcription: savedTranscription.transcription },
 		})
-	} catch (error) {
-		console.error('Error during transcription:', error)
-		return errorResponse('An error occurred while processing the audio.', 500)
+	} catch (error: unknown) {
+		const err = error as CustomError
+
+		const serverError = 'An error occured on the server.'
+
+		if (err.type && err.message) {
+			const [statusStr, ...messageParts] = err.message.trim().split(' ')
+			const status = parseInt(statusStr || '500', 10)
+			const message = messageParts.join(' ').trim() || serverError
+			return errorResponse(message, status)
+		}
+
+		return errorResponse(serverError, 500)
 	}
 }
 
@@ -118,75 +136,51 @@ export function useOpenAiDictation({ buttonId }: { buttonId: string }) {
 
 interface UseVoiceRecorderProps {
 	onDictationComplete: (audioBlob: Blob) => void
-	onDictationError?: (error: Error) => void
+	onDictationError?: (error: string) => void
 }
 
-const useVoiceDictation = ({
-	onDictationComplete,
-	onDictationError,
-}: UseVoiceRecorderProps) => {
-	const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(null)
+const useVoiceDictation = ({ onDictationComplete }: UseVoiceRecorderProps) => {
+	const mediaRecorderRef = useRef<RecordRTCPromisesHandler | null>(null) // useRef instead of useState
 	const { isUsingMicrophone, setIsUsingMicrophone } = useDictationContext()
 	const [isDictating, setDictating] = useState(false)
-	const [mediaStream, setMediaStream] = useState<MediaStream | null>(null)
-	const recordedChunksRef = useRef<Blob[]>([]) // Use a ref to store the chunks
-
-	useEffect(() => {
-		if (mediaRecorder) {
-			mediaRecorder.ondataavailable = (event) => {
-				if (event.data.size > 0) {
-					// Push to the ref's current array
-					recordedChunksRef.current.push(event.data)
-				}
-			}
-
-			mediaRecorder.onstop = () => {
-				const blob = new Blob(recordedChunksRef.current, { type: 'audio/wav' })
-				recordedChunksRef.current = [] // Clear recorded chunks in the ref
-
-				// Stop and release the media stream to avoid memory leaks
-				if (mediaStream) {
-					mediaStream.getTracks().forEach((track) => track.stop())
-				}
-
-				onDictationComplete(blob)
-			}
-		}
-
-		return () => {
-			if (mediaRecorder) {
-				mediaRecorder.ondataavailable = null
-				mediaRecorder.onstop = null
-				mediaRecorder.stream.getTracks().forEach((track) => track.stop()) // Stop all tracks
-			}
-			if (mediaStream) {
-				mediaStream.getTracks().forEach((track) => track.stop()) // Stop the media stream tracks
-			}
-		}
-	}, [mediaRecorder, mediaStream, onDictationComplete])
+	const [error, setError] = useState<string | null>(null)
 
 	const startDictating = async () => {
 		if (!isDictating && !isUsingMicrophone) {
 			try {
+				const { RecordRTCPromisesHandler, StereoAudioRecorder } = await import(
+					'recordrtc'
+				)
 				const stream = await navigator.mediaDevices.getUserMedia({
 					audio: true,
 				})
-				const newMediaRecorder = new MediaRecorder(stream)
-				setMediaStream(stream)
-				setMediaRecorder(newMediaRecorder)
-				newMediaRecorder.start()
+				const recorder = new RecordRTCPromisesHandler(stream, {
+					mimeType: 'audio/wav',
+					recorderType: StereoAudioRecorder,
+					bufferSize: 2048,
+					numberOfAudioChannels: 1, // Mono recording to reduce file size
+					desiredSampRate: 22050,
+				})
+				mediaRecorderRef.current = recorder // Use ref to store the recorder
+				await recorder.startRecording()
 				setDictating(true)
 				setIsUsingMicrophone(true)
 			} catch (error) {
-				console.error('Error accessing microphone:', error)
-				onDictationError?.(error as Error)
+				const err = error as Error
+				console.error('Error accessing microphone:', err.message)
+				setError(err.message)
 			}
 		}
 	}
 
-	const stopDictating = () => {
+	const stopDictating = async () => {
+		const mediaRecorder = mediaRecorderRef.current // Access from ref
 		if (mediaRecorder && isDictating) {
-			mediaRecorder.stop()
+			await mediaRecorder.stopRecording()
+			const audioBlob = await mediaRecorder.getBlob()
+			await mediaRecorder.destroy()
+			mediaRecorderRef.current = null // Set ref to null without causing a re-render
+			onDictationComplete(audioBlob)
 			setDictating(false)
 			setIsUsingMicrophone(false)
 		}
@@ -196,11 +190,27 @@ const useVoiceDictation = ({
 		if (!isDictating) {
 			await startDictating()
 		} else {
-			stopDictating()
+			await stopDictating()
 		}
 	}
 
+	// Cleanup effect when component unmounts
+	useEffect(() => {
+		return () => {
+			const cleanUp = async () => {
+				if (mediaRecorderRef.current) {
+					await mediaRecorderRef.current.destroy()
+					mediaRecorderRef.current = null
+					setDictating(false)
+					setIsUsingMicrophone(false)
+				}
+			}
+			void cleanUp()
+		}
+	}, [setIsUsingMicrophone])
+
 	return {
+		error,
 		isDictating,
 		isUsingMicrophone,
 		toggleDictation,
