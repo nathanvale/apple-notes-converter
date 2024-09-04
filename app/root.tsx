@@ -1,6 +1,6 @@
 import { Links, Meta, Outlet, Scripts } from '@remix-run/react'
 import { DictationInput } from './components/DictationInput'
-import { DictationProvider } from './utils/providers/DictationProvider'
+import { DictationProvider } from './routes/resources+/open-ai-dictation'
 
 function Document({ children }: { children: React.ReactNode }) {
 	return (
@@ -14,7 +14,6 @@ function Document({ children }: { children: React.ReactNode }) {
 			</head>
 			<body className="bg-background text-foreground">
 				{children}
-
 				<Scripts />
 			</body>
 		</html>
