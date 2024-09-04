@@ -26,9 +26,9 @@ export default function Root() {
 		<DictationProvider>
 			<Document>
 				<Outlet />
-				<DictationInput buttonId="button1" />
-				<DictationInput buttonId="button2" />
-				<DictationInput buttonId="button3" />
+				<DictationInput />
+				<DictationInput />
+				<DictationInput />
 			</Document>
 		</DictationProvider>
 	)

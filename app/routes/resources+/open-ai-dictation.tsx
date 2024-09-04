@@ -72,9 +72,9 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 	}
 }
 
-export function OpenAiDictationButton({ buttonId }: { buttonId: string }) {
+export function OpenAiDictationButton({ fetcherKey }: { fetcherKey: string }) {
 	const { submitTranscription, isProcessing } = useOpenAiDictation({
-		buttonId,
+		fetcherKey,
 	})
 
 	const onDictationComplete = (audioBlob: Blob) => {
@@ -100,9 +100,9 @@ export function OpenAiDictationButton({ buttonId }: { buttonId: string }) {
 	)
 }
 
-export function useOpenAiDictation({ buttonId }: { buttonId: string }) {
+export function useOpenAiDictation({ fetcherKey }: { fetcherKey: string }) {
 	const fetcher = useFetcher<typeof action>({
-		key: buttonId,
+		key: fetcherKey,
 	})
 
 	const [transcription, setTranscription] = useState<string | null>(null)
