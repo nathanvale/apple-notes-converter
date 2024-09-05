@@ -1,6 +1,12 @@
+import { type LinksFunction } from '@remix-run/node'
 import { Links, Meta, Outlet, Scripts } from '@remix-run/react'
 import { DictationInput } from './components/DictationInput'
 import { DictationProvider } from './routes/resources+/open-ai-dictation'
+import tailwindStyleSheetUrl from './styles/tailwind.css?url'
+
+export const links: LinksFunction = () => {
+	return [{ rel: 'stylesheet', href: tailwindStyleSheetUrl }].filter(Boolean)
+}
 
 function Document({ children }: { children: React.ReactNode }) {
 	return (

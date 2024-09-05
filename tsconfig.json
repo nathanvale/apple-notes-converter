@@ -1,5 +1,5 @@
 {
-	"include": ["**/*.ts", "**/*.tsx"],
+	"include": ["**/*.ts", "**/*.tsx", "tailwind.config.ts"],
 	"exclude": ["node_modules", "dist", ".quokka"],
 	"extends": ["./node_modules/@epic-web/config/typescript.json"],
 	"compilerOptions": {

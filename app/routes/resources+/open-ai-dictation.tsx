@@ -10,6 +10,7 @@ import {
 	useContext,
 } from 'react'
 import { type RecordRTCPromisesHandler } from 'recordrtc'
+import { Button } from '#app/components/ui/button'
 import { type ErrorResponse, type SuccessResponse } from '#app/types/api'
 import { prisma } from '#node/utils/db.server'
 
@@ -96,13 +97,13 @@ export function OpenAiDictationButton({ fetcherKey }: { fetcherKey: string }) {
 	)
 
 	return (
-		<button
+		<Button
 			type="button"
 			onClick={toggleDictation}
 			disabled={isProcessing || (isUsingMicrophone && !isDictating)}
 		>
 			{isDictating ? 'Stop Recording' : 'Start Recording!'}
-		</button>
+		</Button>
 	)
 }
 
