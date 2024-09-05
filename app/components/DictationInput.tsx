@@ -23,7 +23,7 @@ export function DictationInput() {
 			/>
 			<OpenAiDictationButton fetcherKey={fetcherKey} />
 			{isProcessing && <p className="ml-2">Processing...</p>}
-			{error && <p className="ml-2 error">{error}</p>}
+			{error && <p className="error ml-2">{error}</p>}
 		</div>
 	)
 }
