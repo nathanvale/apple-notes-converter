@@ -1,6 +1,6 @@
 import { type LinksFunction } from '@remix-run/node'
 import { Links, Meta, Outlet, Scripts } from '@remix-run/react'
-import { DictationInput } from './components/DictationInput'
+import { Dashboard } from './components/Dashboard'
 import { DictationProvider } from './routes/resources+/open-ai-dictation'
 import tailwindStyleSheetUrl from './styles/tailwind.css?url'
 
@@ -31,9 +31,7 @@ export default function Root() {
 		<DictationProvider>
 			<Document>
 				<Outlet />
-				<DictationInput />
-				<DictationInput />
-				<DictationInput />
+				<Dashboard />
 			</Document>
 		</DictationProvider>
 	)
