@@ -90,8 +90,6 @@ export async function processEntries() {
 			await convertJsonToPrismaModels(parsedJournal)
 		}
 
-		console.log('Entries have been inserted into the database successfully.')
-
 		// Close the Prisma client connection after all operations are done
 		await prisma.$disconnect()
 	} catch (error) {

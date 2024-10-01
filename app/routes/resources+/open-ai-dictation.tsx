@@ -2,12 +2,12 @@ import { type ActionFunctionArgs, json } from '@remix-run/node'
 import { useFetcher } from '@remix-run/react'
 import OpenAI from 'openai'
 import {
-	useEffect,
-	useState,
-	useRef,
 	createContext,
 	type ReactNode,
 	useContext,
+	useEffect,
+	useRef,
+	useState,
 } from 'react'
 import { type RecordRTCPromisesHandler } from 'recordrtc'
 import { Button } from '#app/components/ui/button'
@@ -22,10 +22,6 @@ type CustomError = Error & {
 	param?: string
 	type?: string
 }
-
-const openai = new OpenAI({
-	apiKey: process.env.OPENAI_API_KEY,
-})
 
 const errorResponse = (message: string, status: number = 400) => {
 	return json<ErrorResponse>({ status: 'error', message }, { status })
@@ -47,6 +43,10 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 		if (audioFile.size > 10 * 1024 * 1024) {
 			return errorResponse('File size exceeds 10MB limit.')
 		}
+
+		const openai = new OpenAI({
+			apiKey: process.env.OPENAI_API_KEY,
+		})
 
 		const response = await openai.audio.transcriptions.create({
 			file: audioFile, // Pass the readable stream directly
@@ -111,21 +111,40 @@ export function useOpenAiDictation({ fetcherKey }: { fetcherKey: string }) {
 	const fetcher = useFetcher<typeof action>({
 		key: fetcherKey,
 	})
-
 	const [transcription, setTranscription] = useState<string | null>(null)
 	const [error, setError] = useState<string | null>(null)
+	const promiseRef = useRef<{
+		resolve: (value: string) => void
+		reject: (reason: Error) => void
+	} | null>(null)
 
 	useEffect(() => {
 		if (fetcher.state === 'idle' && fetcher.data) {
 			if (fetcher.data.status === 'success') {
 				setTranscription(fetcher.data.data.transcription)
 				setError(null)
+				promiseRef.current?.resolve(fetcher.data.data.transcription)
 			} else if (fetcher.data.status === 'error') {
 				setError(fetcher.data.message)
 				setTranscription(null)
+				promiseRef.current?.reject(new Error(fetcher.data.message))
 			}
 		}
 	}, [fetcher.state, fetcher.data])
+
+	// Function to submit the transcription request as a Promise
+	const submitTranscriptionAsync = (payload: FormData) => {
+		fetcher.submit(payload, {
+			action: '/resources/open-ai-dictation',
+			method: 'post',
+			encType: 'multipart/form-data',
+		})
+
+		// Return a new promise and store its resolve/reject handlers
+		return new Promise<string>((resolve, reject) => {
+			promiseRef.current = { resolve, reject }
+		})
+	}
 
 	return {
 		setTranscription,
@@ -137,6 +156,7 @@ export function useOpenAiDictation({ fetcherKey }: { fetcherKey: string }) {
 				method: 'post',
 				encType: 'multipart/form-data',
 			}),
+		submitTranscriptionAsync,
 		isProcessing: fetcher.state === 'submitting',
 	}
 }

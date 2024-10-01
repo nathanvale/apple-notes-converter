@@ -1,11 +1,17 @@
+import typography from '@tailwindcss/typography'
 import { type Config } from 'tailwindcss'
 import animatePlugin from 'tailwindcss-animate'
 import radixPlugin from 'tailwindcss-radix'
+import rtlPlugin from 'tailwindcss-rtl'
+
 export default {
 	content: ['./app/**/*.{ts,tsx,jsx,js}'],
 	darkMode: ['class'],
 	theme: {
 		extend: {
+			height: {
+				'header-height': 'var(--header-height)',
+			},
 			borderRadius: {
 				lg: 'var(--radius)',
 				md: 'calc(var(--radius) - 2px)',
@@ -14,6 +20,7 @@ export default {
 			colors: {
 				background: 'hsl(var(--background))',
 				foreground: 'hsl(var(--foreground))',
+				surface: 'hsl(var(--muted) / 40%)',
 				card: {
 					DEFAULT: 'hsl(var(--card))',
 					foreground: 'hsl(var(--card-foreground))',
@@ -55,5 +62,11 @@ export default {
 			},
 		},
 	},
-	plugins: [animatePlugin, radixPlugin, require('tailwindcss-animate')],
+	plugins: [
+		typography,
+		animatePlugin,
+		radixPlugin,
+		require('tailwindcss-animate'),
+		rtlPlugin,
+	],
 } satisfies Config

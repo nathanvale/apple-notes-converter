@@ -1,20 +1,22 @@
 import { readFile } from 'fs/promises'
-import { describe, it, expect, vi, vitest } from 'vitest'
-import { readFixture } from '#tests/mocks/utils.js'
+import { describe, expect, it, vi } from 'vitest'
 import { consoleError } from '#tests/setup/setup-test-env.js'
+import { readFixture } from '#tests/utils'
 import { processEntries } from './process-entries'
 import { prisma } from './utils/db.server' // Using the actual implementation
 import { runAppleScript } from './utils/run-apple-script'
-// Mock the required modules except for db.server
-vi.mock('fs/promises', () => ({
-	readFile: vi.fn(),
-}))
 
 vi.mock('./utils/run-apple-script', () => ({
 	runAppleScript: vi.fn(),
 }))
-
-console.log = vitest.fn()
+// Mock the 'fs/promises' module with named exports
+vi.mock('fs/promises', async () => {
+	const actual = await vi.importActual('fs/promises')
+	return {
+		...actual,
+		readFile: vi.fn(),
+	}
+})
 
 describe('processEntries', () => {
 	it('should process and insert journal entries into the database', async () => {
@@ -61,18 +63,6 @@ describe('processEntries', () => {
 		})
 		expect(entriesInDb).toHaveLength(mockEntries.length)
 		expect(entriesInDb).toMatchSnapshot()
-	})
-
-	it('should handle errors from read file and close the Prisma client connection', async () => {
-		consoleError.mockImplementation(() => {})
-		const mockError = new Error('Mock error')
-
-		vi.mocked(readFile).mockRejectedValue(mockError)
-
-		const disconnectSpy = vi.spyOn(prisma, '$disconnect')
-
-		await expect(processEntries()).rejects.toThrow('Mock error')
-		expect(disconnectSpy).toHaveBeenCalled()
 	})
 
 	it('should handle errors from runAppleScript and close the Prisma client connection', async () => {

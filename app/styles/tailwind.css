@@ -29,6 +29,7 @@
 		--chart-5: 27 87% 67%;
 		--radius: 0.5rem;
 		--primary-foreground: 0 0% 98%;
+		--header-height: 3.5rem;
 	}
 	.dark {
 		--background: 0 0% 3.9%;
@@ -61,7 +62,10 @@
 	* {
 		@apply border-border;
 	}
+	html {
+		@apply h-full;
+	}
 	body {
-		@apply bg-background text-foreground;
+		@apply h-full bg-background text-foreground;
 	}
 }
