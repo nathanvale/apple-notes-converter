@@ -1,12 +1,14 @@
 {
-	"include": ["**/*.ts", "**/*.tsx", "tailwind.config.ts"],
+	"include": ["**/*.ts", "**/*.tsx"],
 	"exclude": ["node_modules", "dist", ".quokka"],
 	"extends": ["./node_modules/@epic-web/config/typescript.json"],
 	"compilerOptions": {
+		"types": ["vitest/globals", "@testing-library/jest-dom"],
 		"paths": {
 			"#app/*": ["./app/*"],
 			"#tests/*": ["./tests/*"],
 			"#node/*": ["./src/*"]
-		}
+		},
+		"moduleResolution": "node"
 	}
 }

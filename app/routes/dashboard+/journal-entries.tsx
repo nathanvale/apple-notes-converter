@@ -1,25 +1,23 @@
-import { Button } from '#app/components/ui/button'
+import { ChatBox } from '#app/components/chat/chat-box'
+import { ChatResponse } from '#app/components/chat/chat-response'
+import { ChatTurn } from '#app/components/chat/chat-turn'
 
 export default function JournalEntries() {
 	return (
-		<>
-			<div className="flex items-center">
-				<h1 className="text-lg font-semibold md:text-2xl">Journal Entries</h1>
+		<div role="presentation" className="flex h-full flex-col">
+			<div className="h-full flex-1 overflow-y-auto focus-visible:outline-0">
+				<ChatTurn />
+				<ChatResponse />
+				<ChatTurn />
+				<ChatResponse />
+				<ChatTurn />
+				<ChatResponse />
+				<ChatTurn />
+				<ChatResponse />
+				<ChatTurn />
+				<ChatResponse isMostRecentResponse />
 			</div>
-			<div
-				className="flex flex-1 items-center justify-center rounded-lg border border-dashed shadow-sm"
-				x-chunk="dashboard-02-chunk-1"
-			>
-				<div className="flex flex-col items-center gap-1 text-center">
-					<h3 className="text-2xl font-bold tracking-tight">
-						You have no journal entries.
-					</h3>
-					<p className="text-sm text-muted-foreground">
-						Start documenting your thoughts by adding a new entry.
-					</p>
-					<Button className="mt-4">Start Writing</Button>
-				</div>
-			</div>
-		</>
+			<ChatBox />
+		</div>
 	)
 }

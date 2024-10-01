@@ -6,3 +6,4 @@ declare module 'applescript' {
 
 	export { execString }
 }
+declare module 'tailwindcss-rtl' {}
